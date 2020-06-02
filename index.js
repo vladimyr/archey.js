@@ -53,7 +53,7 @@ var tasks = [
           done();
         });
         break;
-      case 'OS X':
+      case 'macOS':
         exec('sw_vers', function(err, stdout, stderr) {
           var items = { };
           stdout.trim().split('\n').forEach(function(line) {
@@ -146,7 +146,7 @@ var tasks = [
           done();
         });
         break;
-      case 'OS X':
+      case 'macOS':
         // port
         exec('port installed 2>/dev/null | wc -l', function(err, stdout, stderr) {
           var packages = 0;
@@ -264,7 +264,7 @@ module.exports = function(onDone) {
   switch(os.platform()) {
     case 'darwin':
       processes = [];
-      distro = 'OS X';
+      distro = 'macOS';
       result.wm = { key: 'Window Manager', value: 'Quartz Compositor' };
       fullParallel(tasks, onDone);
       break;
