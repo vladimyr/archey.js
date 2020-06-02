@@ -195,15 +195,27 @@ var tasks = [
     switch(os.platform()) {
       case 'freebsd':
       case 'darwin':
-        // OSX df is weird, it doesn't have a good option for getting bytes...
-        exec('df -k / 2>/dev/null | tail -1', function(err, stdout, stderr) {
-          var lines = stdout.trim().split('\n').pop(),
-              used = parseInt(lines.split(/\s+/)[2], 10) * 1024,
-              free = parseInt(lines.split(/\s+/)[3], 10) * 1024,
-              total = used + free;
+        (function (parse) {
+          if(distro == 'FreeBSD') {
+            return exec('df -kc /', parse);
+          }
+          exec('sw_vers -productVersion', function(err, stdout, stderr) {
+            var version = stdout.trim(),
+                minorVersion = parseInt(version.split('.')[1], 10);
+            if(minorVersion >= 15) {
+              exec('df -k /System/Volumes/Data', parse);
+            } else {
+              exec('df -k /', parse);
+            }
+          });
+        }(function(err, stdout, stderr) {
+          var line = stdout.trim().split(/\n/).pop(),
+              cols = line.split(/\s+/),
+              total = parseInt(cols[1], 10) * 1024,
+              used = parseInt(cols[2], 10) * 1024;
           result.disk = { key: 'Disk', value: color(used, total, 1000) };
           done();
-        });
+        }));
         break;
       case 'win32':
       case 'win64':
