@@ -1,15 +1,15 @@
 var exec = require('child_process').exec,
     os = require('os'),
-    bytes = require('bytes'),
+    bytes = require('./lib/bytes'),
     colors = require('./art/colors.js'),
     elapsed = require('./lib/elapsed.js'),
     deDict = require('./lib/de-dict.json'),
     wmDict = require('./lib/wm-dict.json');
 
-function color(used, total) {
+function color(used, total, base) {
   var quadrant = Math.min(Math.ceil( Math.floor(used / total * 100) / 33), 3),
       cols = [ colors.greenB, colors.greenB, colors.yellowB, colors.redB ];
-  return cols[quadrant] + bytes(used) + colors.clear + ' / ' + bytes(total);
+  return cols[quadrant] + bytes(used, base) + colors.clear + ' / ' + bytes(total, base);
 }
 
 var result = {
@@ -201,7 +201,7 @@ var tasks = [
               used = parseInt(lines.split(/\s+/)[2], 10) * 1024,
               free = parseInt(lines.split(/\s+/)[3], 10) * 1024,
               total = used + free;
-          result.disk = { key: 'Disk', value: color( used, total) };
+          result.disk = { key: 'Disk', value: color(used, total, 1000) };
           done();
         });
         break;
